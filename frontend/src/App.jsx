@@ -78,6 +78,8 @@ function getCurrencySymbol(code) {
   }
 }
 
+const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || 'http://localhost:5000';
+
 export default function App() {
   const [query, setQuery] = useState('');
   const [reportsHistory, setReportsHistory] = useState([]);
@@ -116,7 +118,7 @@ export default function App() {
 
   const fetchHistory = async () => {
     try {
-      const res = await fetch('http://localhost:5000/api/reports');
+      const res = await fetch(`${BACKEND_URL}/api/reports`);
       const data = await res.json();
       setReportsHistory(data);
     } catch (e) {
@@ -126,7 +128,7 @@ export default function App() {
 
   const fetchConfig = async () => {
     try {
-      const res = await fetch('http://localhost:5000/api/config');
+      const res = await fetch(`${BACKEND_URL}/api/config`);
       if (res.ok) {
         const data = await res.json();
         setLlmConfig(data);
@@ -139,7 +141,7 @@ export default function App() {
   const handleClearHistory = async () => {
     if (!window.confirm("Are you sure you want to clear all research history? This cannot be undone.")) return;
     try {
-      const res = await fetch('http://localhost:5000/api/reports', {
+      const res = await fetch(`${BACKEND_URL}/api/reports`, {
         method: 'DELETE'
       });
       if (res.ok) {
@@ -157,7 +159,7 @@ export default function App() {
 
   const loadReportDetails = async (id) => {
     try {
-      const res = await fetch(`http://localhost:5000/api/reports/${id}`);
+      const res = await fetch(`${BACKEND_URL}/api/reports/${id}`);
       const data = await res.json();
       setActiveReport(data);
       setActiveReportId(id);
@@ -187,7 +189,7 @@ export default function App() {
     setActiveReportTab('logs'); // Default to showing live logs
     setCurrentLogs([]);
 
-    const searchUrl = `http://localhost:5000/api/research/run?query=${encodeURIComponent(searchQuery)}`;
+    const searchUrl = `${BACKEND_URL}/api/research/run?query=${encodeURIComponent(searchQuery)}`;
     const eventSource = new EventSource(searchUrl);
 
     eventSource.onmessage = (event) => {

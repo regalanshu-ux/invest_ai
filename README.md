@@ -3,6 +3,7 @@
 investAI is a premium, state-of-the-art agentic AI web application that performs automated financial research on equities. Powered by **LangGraph** and **LangChain** on the backend and featuring a modern, dark-mode dashboard built in **React (Vite)** on the frontend, it delivers institutional-grade investment evaluations.
 
 Repository Link: [https://github.com/regalanshu-ux/invest_ai](https://github.com/regalanshu-ux/invest_ai)
+Live Demo Link: [https://invest-ai-brown.vercel.app/](https://invest-ai-brown.vercel.app/)
 
 ---
 
@@ -106,3 +107,36 @@ graph TD
     │   └── main.jsx     # Vite client entry point
     └── index.html       # Client HTML page container
 ```
+
+---
+
+## Deployment Guide
+
+Deploying this monorepo application involves launching the React client on Vercel and hosting the persistent Node.js Express server on a long-running instance provider (like Render, Railway, or Heroku).
+
+### 1. Deploying Frontend (React/Vite) on Vercel
+1. Log in to [Vercel](https://vercel.com) and click **Add New** > **Project**.
+2. Select your cloned Git repository `https://github.com/regalanshu-ux/invest_ai`.
+3. In the project setup panel, click **Edit** next to **Root Directory** and select `frontend`.
+4. Vercel will automatically select the **Vite** framework preset.
+5. In **Environment Variables**, add:
+   * `VITE_BACKEND_URL`: `https://invest-ai.onrender.com` (point this to your deployed Express backend URL).
+6. Click **Deploy**.
+
+> [!NOTE]
+> Make sure to update the fetch URLs in `frontend/src/App.jsx` to dynamically point to `import.meta.env.VITE_BACKEND_URL` in production.
+
+### 2. Deploying Backend (Express/Node) on Render / Railway
+Because the Express backend streams real-time console updates (via Server-Sent Events) and coordinates multiple LLM API request links which can exceed standard Vercel serverless function timeouts (typically 10-15s), it is best deployed on a persistent Node.js platform:
+1. Log in to [Render](https://render.com) or Railway and select **New Web Service**.
+2. Link your Git repository.
+3. Configure the following build properties:
+   * **Root Directory**: `backend`
+   * **Build Command**: `npm install`
+   * **Start Command**: `npm run dev` (or `node server.js`)
+4. In the service's Environment Variables, paste the parameters from your `backend/.env` file:
+   * `LLM_PROVIDER`, `LLM_MODEL`, `LLM_API_KEY`
+   * `MONGODB_URI` (your resolved MongoDB Atlas connection string)
+   * `PORT`: `5000` (or leave default)
+5. Click **Create Web Service**. Once deployed, copy your custom web service URL and paste it as the `VITE_BACKEND_URL` environment variable in your Vercel React frontend.
+
